@@ -32,7 +32,7 @@ public class UserCreateRequestDTO {
             "</ul>" +
             "<p><strong>Examples:</strong> <code>john_doe_2023</code>, <code>user-admin</code>, <code>testuser123</code></p>", 
             example = "john_doe_2023", 
-            minLength = 6, 
+            minLength = 5, 
             maxLength = 50,
             requiredMode = Schema.RequiredMode.REQUIRED)
     private String username;
