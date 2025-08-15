@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/profile")
+@RequestMapping("/my/profile")
 @Tag(name = "Profile", description = "User profile management APIs (Protected)")
 @SecurityRequirement(name = "bearerAuth")
 public class ProfileController {

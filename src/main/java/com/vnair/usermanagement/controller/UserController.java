@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/admin/users")
 @CrossOrigin(origins = "*")
 @Tag(name = "User Management", description = "APIs for managing users in the system")
 public class UserController {

@@ -27,6 +27,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
@@ -34,9 +35,10 @@ public class SecurityConfig {
                 .requestMatchers("/web/**", "/css/**", "/js/**", "/images/**").permitAll()
                 // Swagger UI endpoints
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                // Protected endpoints
-                .requestMatchers("/profile/**").authenticated()
-                .requestMatchers("/users/**").authenticated()
+                // Protected endpoints - my access
+                .requestMatchers("/my/**").authenticated()
+                // Protected endpoints - admin role: user_mgmt, plan_mgmt
+                .requestMatchers("/admin/**").authenticated()
                 .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
