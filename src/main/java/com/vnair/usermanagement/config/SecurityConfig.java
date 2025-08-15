@@ -23,6 +23,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/web/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/users/**").permitAll()
+                // Swagger UI endpoints
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .anyRequest().permitAll()
             );
         

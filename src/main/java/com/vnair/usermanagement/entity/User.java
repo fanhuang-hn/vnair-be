@@ -3,7 +3,6 @@ package com.vnair.usermanagement.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -28,9 +27,7 @@ public class User {
     @Email(message = "Email should be valid")
     private String email;
     
-    @Column(nullable = false)
-    @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^[0-9+()-\\s]+$", message = "Invalid phone number format")
+    @Column(nullable = true)
     private String phone;
     
     @Column(name = "password_hash", nullable = false)

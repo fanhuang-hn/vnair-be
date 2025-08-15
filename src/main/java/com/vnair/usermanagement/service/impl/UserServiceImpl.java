@@ -18,17 +18,33 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
+import java.util.Random;
+
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
     
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final Random RANDOM = new SecureRandom();
     
     @Autowired
     private UserRepository userRepository;
     
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    
+    /**
+     * Generate a random password with 6 characters
+     */
+    private String generateRandomPassword() {
+        StringBuilder password = new StringBuilder(6);
+        for (int i = 0; i < 6; i++) {
+            password.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
+        }
+        return password.toString();
+    }
     
     @Override
     public UserResponseDTO createUser(UserCreateRequestDTO createRequest) {
@@ -44,20 +60,30 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateUserException("Email already exists: " + createRequest.getEmail());
         }
         
-        if (userRepository.existsByPhone(createRequest.getPhone())) {
+        // Only check phone duplicates if phone is provided and not empty
+        if (createRequest.getPhone() != null && !createRequest.getPhone().trim().isEmpty() 
+            && userRepository.existsByPhone(createRequest.getPhone())) {
             throw new DuplicateUserException("Phone number already exists: " + createRequest.getPhone());
+        }
+        
+        // Handle password: generate if not provided
+        String password = createRequest.getPassword();
+        if (password == null || password.trim().isEmpty()) {
+            password = generateRandomPassword();
+            logger.info("Auto-generated password for user: {}", createRequest.getUsername());
         }
         
         // Create new user
         User user = new User();
         user.setUsername(createRequest.getUsername());
         user.setEmail(createRequest.getEmail());
-        user.setPhone(createRequest.getPhone());
-        user.setPasswordHash(passwordEncoder.encode(createRequest.getPassword()));
-        user.setStatus(createRequest.getStatus());
+        user.setPhone(createRequest.getPhone() != null ? createRequest.getPhone().trim() : "");
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setStatus(createRequest.getStatus() != null ? createRequest.getStatus() : UserStatus.ACTIVE);
         
         User savedUser = userRepository.save(user);
-        logger.info("User created successfully with ID: {}", savedUser.getId());
+        logger.info("User created successfully with ID: {} and password {}", savedUser.getId(), 
+                   createRequest.getPassword() == null ? "auto-generated" : "provided");
         
         return mapToResponseDTO(savedUser);
     }
